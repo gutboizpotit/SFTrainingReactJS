@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react';
 import JobCard from '../components/JobCard';
+import { deleteJob } from '../api/JobAPI';
 
 const Dashboard = ({ jobs, setJobs, setActiveTab, setEditingJob }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  // Filter jobs based on search term and status
   const filteredJobs = useMemo(() => {
     return jobs.filter(job => {
       const matchesSearch = job.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -22,7 +22,13 @@ const Dashboard = ({ jobs, setJobs, setActiveTab, setEditingJob }) => {
 
   const handleDelete = (jobId) => {
     if (window.confirm('Are you sure you want to delete this job?')) {
-      setJobs(jobs.filter(job => job.id !== jobId));
+      const deletedJob = deleteJob(jobId);
+      if (deletedJob) {
+        setJobs(jobs.filter(job => job.id !== jobId));
+        alert('✅ Job Deleted Successfully!');
+      } else {
+        alert('❌ Failed to delete job. Please try again.');
+      }
     }
   };
 
@@ -32,7 +38,7 @@ const Dashboard = ({ jobs, setJobs, setActiveTab, setEditingJob }) => {
   };
 
   return (
-    <main className="flex-1 p-4 md:p-8 bg-white">
+    <main className="flex-1 p-4 md:p-8 bg-white min-h-full">
       <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900">
         My Jobs
       </h1>

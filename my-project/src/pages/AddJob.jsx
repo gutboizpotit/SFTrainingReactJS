@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createJob, updateJob } from '../api/JobAPI';
 
 const AddJob = ({ jobs, setJobs, setActiveTab, editingJob, setEditingJob }) => {
   const [formData, setFormData] = useState({
@@ -70,20 +71,27 @@ const AddJob = ({ jobs, setJobs, setActiveTab, editingJob, setEditingJob }) => {
     const jobData = {
       ...formData,
       id: editingJob ? editingJob.id : Date.now(),
-      appliedDate: editingJob ? editingJob.appliedDate : new Date().toISOString().split('T')[0]
+      applied_date: editingJob ? editingJob.applied_date : new Date().toISOString().split('T')[0]
     };
 
     if (editingJob) {
-      // Update existing job
-      setJobs(jobs.map(job => job.id === editingJob.id ? jobData : job));
-      alert('✅ Job Updated Successfully!');
+      const response = updateJob(editingJob.id, jobData);
+      if (response) {
+        setJobs(jobs.map(job => job.id === editingJob.id ? jobData : job));
+        alert('✅ Job Updated Successfully!');
+      } else {
+        alert('❌ Failed to update job. Please try again.');
+      }
     } else {
-      // Add new job
-      setJobs([...jobs, jobData]);
-      alert('✅ Job Added Successfully!');
+      const response = createJob(jobData);
+      if (response) {
+        setJobs([...jobs, jobData]);
+        alert('✅ Job Added Successfully!');
+      } else {
+        alert('❌ Failed to add job. Please try again.');
+      }
     }
 
-    // Reset form and go back to dashboard
     setFormData({
       company: '',
       position: '',
@@ -106,8 +114,8 @@ const AddJob = ({ jobs, setJobs, setActiveTab, editingJob, setEditingJob }) => {
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center p-4 bg-gray-50 min-h-screen">
-      <div className="w-full max-w-lg bg-white rounded-lg shadow-lg p-6 md:p-8">
+    <div className="flex-1 flex items-center justify-center p-4 bg-white min-h-full">
+      <div className="w-full max-w-lg bg-gray-50 rounded-lg shadow-lg p-6 md:p-8">
         <div className="mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-2">
             {editingJob ? 'Edit Job' : 'Add New Job'}
@@ -199,6 +207,7 @@ const AddJob = ({ jobs, setJobs, setActiveTab, editingJob, setEditingJob }) => {
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               type="submit"
+              onClick={handleSubmit}
               className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               {editingJob ? 'Update Job' : 'Submit Job'}

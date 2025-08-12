@@ -6,7 +6,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <aside className="w-full md:w-56 bg-gray-100 p-4">
+    <aside className="w-full md:w-56 bg-gray-100 p-4 h-full min-h-[calc(100vh-64px)] md:min-h-full">
       <nav className="space-y-2">
         {menuItems.map((item) => (
           <button

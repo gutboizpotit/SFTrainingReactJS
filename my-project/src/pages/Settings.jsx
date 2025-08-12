@@ -1,6 +1,6 @@
 const Settings = () => {
   return (
-    <main className="flex-1 p-4 md:p-8 bg-white">
+    <main className="flex-1 p-4 md:p-8 bg-white min-h-full">
       <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900">
         Settings
       </h1>

@@ -7,10 +7,10 @@ const Layout = ({ children, activeTab, setActiveTab }) => {
   const [headerMenuOpen, setHeaderMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header onMobileMenuToggle={setHeaderMenuOpen} />
       
-      <div className="flex flex-col md:flex-row min-h-[calc(100vh-64px)]">
+      <div className="flex flex-col md:flex-row flex-1">
         {/* Mobile sidebar overlay */}
         {sidebarOpen && (
           <div 
@@ -23,13 +23,14 @@ const Layout = ({ children, activeTab, setActiveTab }) => {
         <div className={`
           fixed md:static inset-y-0 left-0 z-20 md:z-auto
           transform md:transform-none transition-transform duration-200 ease-in-out
+          h-full md:flex-shrink-0
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         `}>
           <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
         
         {/* Main content */}
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 bg-white flex flex-col">
           {children}
         </div>
       </div>

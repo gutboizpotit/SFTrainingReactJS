@@ -28,7 +28,7 @@ const JobCard = ({ job, onEdit, onDelete }) => {
             {job.status}
           </span>
           <p className="text-xs text-gray-400 mb-4">
-            Applied: {job.appliedDate}
+            Applied: {job.applied_date}
           </p>
           {job.notes && (
             <p className="text-sm text-gray-600 mb-4 line-clamp-2">
