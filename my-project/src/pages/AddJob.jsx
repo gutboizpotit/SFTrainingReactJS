@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
-import { createJob, updateJob } from '../api/JobAPI';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { createJob, updateJob } from "../api/JobAPI";
 
-const AddJob = ({ jobs, setJobs, setActiveTab, editingJob, setEditingJob }) => {
+const AddJob = ({ jobs, setJobs, editingJob, setEditingJob }) => {
   const [formData, setFormData] = useState({
-    company: '',
-    position: '',
-    status: 'Applied',
-    notes: ''
+    company: "",
+    position: "",
+    status: "Applied",
+    notes: "",
   });
 
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   // Load editing job data
   useEffect(() => {
@@ -18,52 +20,51 @@ const AddJob = ({ jobs, setJobs, setActiveTab, editingJob, setEditingJob }) => {
         company: editingJob.company,
         position: editingJob.position,
         status: editingJob.status,
-        notes: editingJob.notes || ''
+        notes: editingJob.notes || "",
       });
     } else {
       setFormData({
-        company: '',
-        position: '',
-        status: 'Applied',
-        notes: ''
+        company: "",
+        position: "",
+        status: "Applied",
+        notes: "",
       });
     }
   }, [editingJob]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
-    // Clear error when user starts typing
+
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.company.trim()) {
-      newErrors.company = 'Company name is required';
+      newErrors.company = "Company name is required";
     }
-    
+
     if (!formData.position.trim()) {
-      newErrors.position = 'Position is required';
+      newErrors.position = "Position is required";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -71,46 +72,48 @@ const AddJob = ({ jobs, setJobs, setActiveTab, editingJob, setEditingJob }) => {
     const jobData = {
       ...formData,
       id: editingJob ? editingJob.id : Date.now(),
-      applied_date: editingJob ? editingJob.applied_date : new Date().toISOString().split('T')[0]
+      applied_date: editingJob
+        ? editingJob.applied_date
+        : new Date().toISOString().split("T")[0],
     };
 
     if (editingJob) {
       const response = updateJob(editingJob.id, jobData);
       if (response) {
-        setJobs(jobs.map(job => job.id === editingJob.id ? jobData : job));
-        alert('✅ Job Updated Successfully!');
+        setJobs(jobs.map((job) => (job.id === editingJob.id ? jobData : job)));
+        alert("✅ Job Updated Successfully!");
       } else {
-        alert('❌ Failed to update job. Please try again.');
+        alert("❌ Failed to update job. Please try again.");
       }
     } else {
       const response = createJob(jobData);
       if (response) {
         setJobs([...jobs, jobData]);
-        alert('✅ Job Added Successfully!');
+        alert("✅ Job Added Successfully!");
       } else {
-        alert('❌ Failed to add job. Please try again.');
+        alert("❌ Failed to add job. Please try again.");
       }
     }
 
     setFormData({
-      company: '',
-      position: '',
-      status: 'Applied',
-      notes: ''
+      company: "",
+      position: "",
+      status: "Applied",
+      notes: "",
     });
     setEditingJob(null);
-    setActiveTab('dashboard');
+    navigate("/"); // Điều hướng về dashboard
   };
 
   const handleCancel = () => {
     setFormData({
-      company: '',
-      position: '',
-      status: 'Applied',
-      notes: ''
+      company: "",
+      position: "",
+      status: "Applied",
+      notes: "",
     });
     setEditingJob(null);
-    setActiveTab('dashboard');
+    navigate("/");
   };
 
   return (
@@ -118,17 +121,22 @@ const AddJob = ({ jobs, setJobs, setActiveTab, editingJob, setEditingJob }) => {
       <div className="w-full max-w-lg bg-gray-50 rounded-lg shadow-lg p-6 md:p-8">
         <div className="mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-2">
-            {editingJob ? 'Edit Job' : 'Add New Job'}
+            {editingJob ? "Edit Job" : "Add New Job"}
           </h1>
           <p className="text-center text-gray-600">
-            {editingJob ? 'Update your job application details' : 'Track your job applications'}
+            {editingJob
+              ? "Update your job application details"
+              : "Track your job applications"}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Company Field */}
           <div>
-            <label htmlFor="company" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label
+              htmlFor="company"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
               Company *
             </label>
             <input
@@ -139,7 +147,7 @@ const AddJob = ({ jobs, setJobs, setActiveTab, editingJob, setEditingJob }) => {
               onChange={handleChange}
               placeholder="e.g. Google"
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
-                errors.company ? 'border-red-500' : 'border-gray-300'
+                errors.company ? "border-red-500" : "border-gray-300"
               }`}
             />
             {errors.company && (
@@ -149,7 +157,10 @@ const AddJob = ({ jobs, setJobs, setActiveTab, editingJob, setEditingJob }) => {
 
           {/* Position Field */}
           <div>
-            <label htmlFor="position" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label
+              htmlFor="position"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
               Position *
             </label>
             <input
@@ -160,7 +171,7 @@ const AddJob = ({ jobs, setJobs, setActiveTab, editingJob, setEditingJob }) => {
               onChange={handleChange}
               placeholder="e.g. Frontend Developer"
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
-                errors.position ? 'border-red-500' : 'border-gray-300'
+                errors.position ? "border-red-500" : "border-gray-300"
               }`}
             />
             {errors.position && (
@@ -170,7 +181,10 @@ const AddJob = ({ jobs, setJobs, setActiveTab, editingJob, setEditingJob }) => {
 
           {/* Status Field */}
           <div>
-            <label htmlFor="status" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label
+              htmlFor="status"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
               Status
             </label>
             <select
@@ -189,7 +203,10 @@ const AddJob = ({ jobs, setJobs, setActiveTab, editingJob, setEditingJob }) => {
 
           {/* Notes Field */}
           <div>
-            <label htmlFor="notes" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label
+              htmlFor="notes"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
               Notes
             </label>
             <textarea
@@ -207,10 +224,9 @@ const AddJob = ({ jobs, setJobs, setActiveTab, editingJob, setEditingJob }) => {
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               type="submit"
-              onClick={handleSubmit}
               className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
-              {editingJob ? 'Update Job' : 'Submit Job'}
+              {editingJob ? "Update Job" : "Submit Job"}
             </button>
             <button
               type="button"

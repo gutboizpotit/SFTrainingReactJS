@@ -1,40 +1,45 @@
-import { useState, useMemo } from 'react';
-import JobCard from '../components/JobCard';
-import { deleteJob } from '../api/JobAPI';
+import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import JobCard from "../components/JobCard";
+import { deleteJob } from "../api/JobAPI";
 
-const Dashboard = ({ jobs, setJobs, setActiveTab, setEditingJob }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+const Dashboard = ({ jobs, setJobs, setEditingJob }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const navigate = useNavigate();
 
   const filteredJobs = useMemo(() => {
-    return jobs.filter(job => {
-      const matchesSearch = job.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           job.company.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === '' || job.status.toLowerCase() === statusFilter.toLowerCase();
+    return jobs.filter((job) => {
+      const matchesSearch =
+        job.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        job.company.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus =
+        statusFilter === "" ||
+        job.status.toLowerCase() === statusFilter.toLowerCase();
       return matchesSearch && matchesStatus;
     });
   }, [jobs, searchTerm, statusFilter]);
 
   const handleEdit = (job) => {
     setEditingJob(job);
-    setActiveTab('addJob');
+    navigate("/add-job");
   };
 
   const handleDelete = (jobId) => {
-    if (window.confirm('Are you sure you want to delete this job?')) {
+    if (window.confirm("Are you sure you want to delete this job?")) {
       const deletedJob = deleteJob(jobId);
       if (deletedJob) {
-        setJobs(jobs.filter(job => job.id !== jobId));
-        alert('✅ Job Deleted Successfully!');
+        setJobs(jobs.filter((job) => job.id !== jobId));
+        alert("✅ Job Deleted Successfully!");
       } else {
-        alert('❌ Failed to delete job. Please try again.');
+        alert("❌ Failed to delete job. Please try again.");
       }
     }
   };
 
   const handleAddJob = () => {
     setEditingJob(null);
-    setActiveTab('addJob');
+    navigate("/add-job");
   };
 
   return (
@@ -43,7 +48,7 @@ const Dashboard = ({ jobs, setJobs, setActiveTab, setEditingJob }) => {
         My Jobs
       </h1>
 
-      {/* Search and Filter Section */}
+      {/* Search and Filter */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <input
           type="text"
@@ -75,12 +80,13 @@ const Dashboard = ({ jobs, setJobs, setActiveTab, setEditingJob }) => {
       {filteredJobs.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-gray-400 text-6xl mb-4">📝</div>
-          <h3 className="text-xl font-semibold text-gray-600 mb-2">No jobs found</h3>
+          <h3 className="text-xl font-semibold text-gray-600 mb-2">
+            No jobs found
+          </h3>
           <p className="text-gray-500 mb-6">
-            {jobs.length === 0 
-              ? "Start by adding your first job application!" 
-              : "Try adjusting your search or filter criteria."
-            }
+            {jobs.length === 0
+              ? "Start by adding your first job application!"
+              : "Try adjusting your search or filter criteria."}
           </p>
           {jobs.length === 0 && (
             <button
@@ -103,7 +109,7 @@ const Dashboard = ({ jobs, setJobs, setActiveTab, setEditingJob }) => {
           ))}
         </div>
       )}
-      </main>
+    </main>
   );
 };
 
