@@ -9,7 +9,7 @@ import { Toaster } from "react-hot-toast";
 import ConfirmModal from "./components/ConfirmModal";
 import { useConfirm } from "./hooks/useConfirm";
 
-function App() {
+function AppContent() {
   const [jobs, setJobs] = useState([]);
   const [editingJob, setEditingJob] = useState(null);
   const { confirmState, confirm } = useConfirm();
@@ -31,7 +31,7 @@ function App() {
   }, [location.pathname]);
 
   return (
-    <Router>
+    <>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route
@@ -96,6 +96,14 @@ function App() {
         onConfirm={confirmState.onConfirm}
         onCancel={confirmState.onCancel}
       />
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
