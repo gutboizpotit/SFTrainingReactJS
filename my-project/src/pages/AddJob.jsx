@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createJob, updateJob } from "../api/JobAPI";
+import toast from "react-hot-toast";
 
-const AddJob = ({ jobs, setJobs, editingJob, setEditingJob }) => {
+const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
   const [formData, setFormData] = useState({
     company: "",
     position: "",
@@ -62,11 +63,23 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
       return;
+    }
+
+    if (editingJob) {
+      const confirmed = await confirm({
+        title: "Update Job",
+        message: "Are you sure you want to update this job application?",
+        type: "warning"
+      });
+
+      if (!confirmed) {
+        return;
+      }
     }
 
     const jobData = {
@@ -77,35 +90,54 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob }) => {
         : new Date().toISOString().split("T")[0],
     };
 
-    if (editingJob) {
-      const response = updateJob(editingJob.id, jobData);
-      if (response) {
+    try {
+      if (editingJob) {
+        updateJob(editingJob.id, jobData);
         setJobs(jobs.map((job) => (job.id === editingJob.id ? jobData : job)));
-        alert("✅ Job Updated Successfully!");
+        toast.success("Job updated successfully!");
       } else {
-        alert("❌ Failed to update job. Please try again.");
-      }
-    } else {
-      const response = createJob(jobData);
-      if (response) {
+        createJob(jobData);
         setJobs([...jobs, jobData]);
-        alert("✅ Job Added Successfully!");
-      } else {
-        alert("❌ Failed to add job. Please try again.");
+        toast.success("Job added successfully!");
+      }
+
+      setFormData({
+        company: "",
+        position: "",
+        status: "Applied",
+        notes: "",
+      });
+      setEditingJob(null);
+      navigate("/");
+    } catch (error) {
+      console.error("Error saving job:", error);
+      toast.error(editingJob ? "Failed to update job. Please try again." : "Failed to add job. Please try again.");
+    }
+  };
+
+  const handleCancel = async () => {
+    const hasChanges = editingJob ? 
+      (formData.company !== editingJob.company ||
+       formData.position !== editingJob.position ||
+       formData.status !== editingJob.status ||
+       formData.notes !== (editingJob.notes || "")) :
+      (formData.company.trim() !== "" ||
+       formData.position.trim() !== "" ||
+       formData.status !== "Applied" ||
+       formData.notes.trim() !== "");
+
+    if (hasChanges) {
+      const confirmed = await confirm({
+        title: "Discard Changes",
+        message: "Are you sure you want to discard your changes?",
+        type: "warning"
+      });
+
+      if (!confirmed) {
+        return;
       }
     }
 
-    setFormData({
-      company: "",
-      position: "",
-      status: "Applied",
-      notes: "",
-    });
-    setEditingJob(null);
-    navigate("/"); // Điều hướng về dashboard
-  };
-
-  const handleCancel = () => {
     setFormData({
       company: "",
       position: "",

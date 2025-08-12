@@ -2,8 +2,9 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import JobCard from "../components/JobCard";
 import { deleteJob } from "../api/JobAPI";
+import toast from "react-hot-toast";
 
-const Dashboard = ({ jobs, setJobs, setEditingJob }) => {
+const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const navigate = useNavigate();
@@ -25,14 +26,21 @@ const Dashboard = ({ jobs, setJobs, setEditingJob }) => {
     navigate("/add-job");
   };
 
-  const handleDelete = (jobId) => {
-    if (window.confirm("Are you sure you want to delete this job?")) {
-      const deletedJob = deleteJob(jobId);
-      if (deletedJob) {
+  const handleDelete = async (jobId) => {
+    const confirmed = await confirm({
+      title: "Delete Job",
+      message: "Are you sure you want to delete this job? This action cannot be undone.",
+      type: "danger"
+    });
+
+    if (confirmed) {
+      try {
+        await deleteJob(jobId);
         setJobs(jobs.filter((job) => job.id !== jobId));
-        alert("✅ Job Deleted Successfully!");
-      } else {
-        alert("❌ Failed to delete job. Please try again.");
+        toast.success("Job deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting job:", error);
+        toast.error("Failed to delete job. Please try again.");
       }
     }
   };
