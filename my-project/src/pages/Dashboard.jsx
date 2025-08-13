@@ -23,6 +23,22 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
     });
   }, [jobs, searchTerm, statusFilter]);
 
+  // Check permissions for each job
+  const canEditJob = (job) => {
+    if (user?.role === "ADMIN") return true;
+    if (user?.role === "USER") {
+      // User can only edit if they own the job AND status is Pending
+      return job.user === user.username && job.status === "Pending";
+    }
+    return false;
+  };
+
+  const canDeleteJob = (job) => {
+    if (user?.role === "ADMIN") return true;
+    if (user?.role === "USER") return job.user === user.username;
+    return false;
+  };
+
   const handleEdit = (job) => {
     setEditingJob(job);
     navigate("/add-job");
@@ -74,21 +90,9 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
           className="flex-1 md:flex-none md:w-48 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
         >
           <option value="">All Status</option>
-          {user?.role === "USER" ? (
-            <option value="Pending">Pending</option>
-          ) : user?.role === "ADMIN" ? (
-            <>
-              <option value="Approve">Approve</option>
-              <option value="Denied">Denied</option>
-            </>
-          ) : (
-            <>
-              <option value="Applied">Applied</option>
-              <option value="Interview">Interview</option>
-              <option value="Offer">Offer</option>
-              <option value="Rejected">Rejected</option>
-            </>
-          )}
+          <option value="Pending">Pending</option>
+          <option value="Approve">Approve</option>
+          <option value="Denied">Denied</option>
         </select>
         <button
           onClick={handleAddJob}
@@ -127,6 +131,8 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
               job={job}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              canEdit={canEditJob(job)}
+              canDelete={canDeleteJob(job)}
             />
           ))}
         </div>
