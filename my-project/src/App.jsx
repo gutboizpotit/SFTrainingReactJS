@@ -32,7 +32,7 @@ function AppContent() {
       setJobs(jobsData);
     };
     if (user) getJobs();
-  }, [user]);
+  }, [user,jobs]);
 
   useEffect(() => {
     if (location.pathname !== "/add-job") {

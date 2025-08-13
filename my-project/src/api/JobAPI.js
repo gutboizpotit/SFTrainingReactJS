@@ -38,7 +38,7 @@ export const login = async (credentials) => {
     if (user) {
       return {
         success: true,
-        role: user.role,
+        role: user.role == "ADMIN" ? "ADMIN" : "USER",
         token: "fake-jwt-token",
       };
     } else {
