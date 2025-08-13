@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Login from "../pages/Login";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+
 const Header = ({ onMobileMenuToggle }) => {
   const navigate = useNavigate();
+  const { logout } = useAuth ? useAuth() : { logout: () => {} };
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => {
@@ -13,22 +15,27 @@ const Header = ({ onMobileMenuToggle }) => {
     }
   };
 
+  const handleLogout = () => {
+    if (logout) logout();
+    navigate("/login");
+  };
+
   return (
     <header className="bg-indigo-600 text-white px-4 md:px-8 py-4 relative">
       <div className="flex justify-between items-center">
         <div className="logo font-bold text-xl md:text-2xl">JobTracker</div>
         <nav className="hidden md:flex space-x-6">
-          <a href="#" className="hover:underline font-medium">
+          <Link to="/" className="hover:underline font-medium">
             Home
-          </a>
-          <a href="#" className="hover:underline font-medium">
+          </Link>
+          <Link to="/about" className="hover:underline font-medium">
             About
-          </a>
-          <a href="#" className="hover:underline font-medium">
+          </Link>
+          <Link to="/profile" className="hover:underline font-medium">
             Profile
-          </a>
+          </Link>
           <button
-            onClick={navigate("/login")}
+            onClick={handleLogout}
             className="hover:underline font-medium"
           >
             Log Out
@@ -67,27 +74,36 @@ const Header = ({ onMobileMenuToggle }) => {
           {/* Menu */}
           <div className="absolute top-full left-0 right-0 bg-indigo-600 shadow-lg z-40 md:hidden">
             <nav className="flex flex-col py-2">
-              <a
-                href="#"
+              <Link
+                to="/"
                 className="px-4 py-3 hover:bg-indigo-700 font-medium border-b border-indigo-500"
                 onClick={toggleMobileMenu}
               >
                 Home
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                to="/about"
                 className="px-4 py-3 hover:bg-indigo-700 font-medium border-b border-indigo-500"
                 onClick={toggleMobileMenu}
               >
                 About
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                to="/profile"
                 className="px-4 py-3 hover:bg-indigo-700 font-medium"
                 onClick={toggleMobileMenu}
               >
                 Profile
-              </a>
+              </Link>
+              <button
+                onClick={() => {
+                  toggleMobileMenu();
+                  handleLogout();
+                }}
+                className="px-4 py-3 hover:bg-indigo-700 font-medium text-left"
+              >
+                Log Out
+              </button>
             </nav>
           </div>
         </>

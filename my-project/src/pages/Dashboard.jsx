@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import JobCard from "../components/JobCard";
 import { deleteJob } from "../api/JobAPI";
 import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
 
 const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
@@ -29,8 +31,9 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
   const handleDelete = async (jobId) => {
     const confirmed = await confirm({
       title: "Delete Job",
-      message: "Are you sure you want to delete this job? This action cannot be undone.",
-      type: "danger"
+      message:
+        "Are you sure you want to delete this job? This action cannot be undone.",
+      type: "danger",
     });
 
     if (confirmed) {
@@ -71,10 +74,21 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
           className="flex-1 md:flex-none md:w-48 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
         >
           <option value="">All Status</option>
-          <option value="applied">Applied</option>
-          <option value="interview">Interview</option>
-          <option value="offer">Offer</option>
-          <option value="rejected">Rejected</option>
+          {user?.role === "USER" ? (
+            <option value="Pending">Pending</option>
+          ) : user?.role === "ADMIN" ? (
+            <>
+              <option value="Approve">Approve</option>
+              <option value="Denied">Denied</option>
+            </>
+          ) : (
+            <>
+              <option value="Applied">Applied</option>
+              <option value="Interview">Interview</option>
+              <option value="Offer">Offer</option>
+              <option value="Rejected">Rejected</option>
+            </>
+          )}
         </select>
         <button
           onClick={handleAddJob}

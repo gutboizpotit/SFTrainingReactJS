@@ -3,6 +3,8 @@ import {
   Routes,
   Route,
   useLocation,
+  Navigate,
+  Outlet,
 } from "react-router-dom";
 import Layout from "./layouts/MainLayout";
 import Dashboard from "./pages/Dashboard";
@@ -14,22 +16,24 @@ import { Toaster } from "react-hot-toast";
 import ConfirmModal from "./components/ConfirmModal";
 import { useConfirm } from "./hooks/useConfirm";
 import Login from "./pages/Login";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function AppContent() {
   const [jobs, setJobs] = useState([]);
   const [editingJob, setEditingJob] = useState(null);
   const { confirmState, confirm } = useConfirm();
   const location = useLocation();
+  const { user } = useAuth();
 
   useEffect(() => {
     const getJobs = async () => {
       const jobsData = await fetchJobs();
       setJobs(jobsData);
     };
-    getJobs();
-  }, []);
+    if (user) getJobs();
+  }, [user]);
 
-  // Clear editingJob when navigating away from add-job page
   useEffect(() => {
     if (location.pathname !== "/add-job") {
       setEditingJob(null);
@@ -39,37 +43,42 @@ function AppContent() {
   return (
     <>
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={user ? <Navigate to="/" replace /> : <Login />}
+        />
 
-        <Route path="/" element={<Layout />}>
-          <Route
-            index
-            element={
-              <Dashboard
-                jobs={jobs}
-                setJobs={setJobs}
-                setEditingJob={setEditingJob}
-                confirm={confirm}
-              />
-            }
-          />
-          <Route
-            path="add-job"
-            element={
-              <AddJob
-                jobs={jobs}
-                setJobs={setJobs}
-                editingJob={editingJob}
-                setEditingJob={setEditingJob}
-                confirm={confirm}
-              />
-            }
-          />
-          <Route path="settings" element={<Settings />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Layout />}>
+            <Route
+              index
+              path="/"
+              element={
+                <Dashboard
+                  jobs={jobs}
+                  setJobs={setJobs}
+                  setEditingJob={setEditingJob}
+                  confirm={confirm}
+                />
+              }
+            />
+            <Route
+              path="add-job"
+              element={
+                <AddJob
+                  jobs={jobs}
+                  setJobs={setJobs}
+                  editingJob={editingJob}
+                  setEditingJob={setEditingJob}
+                  confirm={confirm}
+                />
+              }
+            />
+            <Route path="settings" element={<Settings />} />
+          </Route>
         </Route>
       </Routes>
 
-      {/* Toast Container */}
       <Toaster
         position="top-right"
         toastOptions={{
@@ -95,7 +104,6 @@ function AppContent() {
         }}
       />
 
-      {/* Confirm Modal */}
       <ConfirmModal
         isOpen={confirmState.isOpen}
         title={confirmState.title}
@@ -110,9 +118,11 @@ function AppContent() {
 
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <AuthProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </AuthProvider>
   );
 }
 

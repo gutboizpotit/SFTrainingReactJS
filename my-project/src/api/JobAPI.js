@@ -1,6 +1,9 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE_URL = 'https://689aa997e727e9657f6238e0.mockapi.io/api/day1/jobs';
+const API_BASE_URL =
+  "https://689aa997e727e9657f6238e0.mockapi.io/api/day1/jobs";
+const API_AUTH_URL =
+  "https://689aa997e727e9657f6238e0.mockapi.io/api/day1/users";
 
 export const fetchJobs = async () => {
   const response = await axios.get(API_BASE_URL);
@@ -20,4 +23,37 @@ export const updateJob = async (jobId, jobData) => {
 export const deleteJob = async (jobId) => {
   const response = await axios.delete(`${API_BASE_URL}/${jobId}`);
   return response.data;
+};
+
+export const login = async (credentials) => {
+  try {
+    const response = await axios.get(API_AUTH_URL);
+    const users = response.data;
+    const user = users.find(
+      (u) =>
+        u.user_name === credentials.username &&
+        u.password === credentials.password
+    );
+
+    if (user) {
+      return {
+        success: true,
+        role: user.role,
+        token: "fake-jwt-token",
+      };
+    } else {
+      return {
+        success: false,
+        role: null,
+        token: null,
+      };
+    }
+  } catch (error) {
+    console.error("Login API error:", error);
+    return {
+      success: false,
+      role: null,
+      token: null,
+    };
+  }
 };

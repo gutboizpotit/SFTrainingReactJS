@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createJob, updateJob } from "../api/JobAPI";
+import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 
 const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     company: "",
     position: "",
-    status: "Applied",
+    status: user?.role === "USER" ? "Pending" : "Applied",
     notes: "",
   });
-
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
@@ -27,11 +28,12 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
       setFormData({
         company: "",
         position: "",
-        status: "Applied",
+        status: user?.role === "USER" ? "Pending" : "Applied",
         notes: "",
       });
     }
-  }, [editingJob]);
+    // eslint-disable-next-line
+  }, [editingJob, user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -74,7 +76,7 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
       const confirmed = await confirm({
         title: "Update Job",
         message: "Are you sure you want to update this job application?",
-        type: "warning"
+        type: "warning",
       });
 
       if (!confirmed) {
@@ -82,8 +84,17 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
       }
     }
 
+    // Always set status to Pending for USER
+    const status =
+      user?.role === "USER"
+        ? "Pending"
+        : user?.role === "ADMIN"
+        ? formData.status
+        : formData.status;
+
     const jobData = {
       ...formData,
+      status,
       id: editingJob ? editingJob.id : Date.now(),
       applied_date: editingJob
         ? editingJob.applied_date
@@ -92,11 +103,11 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
 
     try {
       if (editingJob) {
-        updateJob(editingJob.id, jobData);
+        await updateJob(editingJob.id, jobData);
         setJobs(jobs.map((job) => (job.id === editingJob.id ? jobData : job)));
         toast.success("Job updated successfully!");
       } else {
-        createJob(jobData);
+        await createJob(jobData);
         setJobs([...jobs, jobData]);
         toast.success("Job added successfully!");
       }
@@ -104,33 +115,37 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
       setFormData({
         company: "",
         position: "",
-        status: "Applied",
+        status: user?.role === "USER" ? "Pending" : "Applied",
         notes: "",
       });
       setEditingJob(null);
       navigate("/");
     } catch (error) {
       console.error("Error saving job:", error);
-      toast.error(editingJob ? "Failed to update job. Please try again." : "Failed to add job. Please try again.");
+      toast.error(
+        editingJob
+          ? "Failed to update job. Please try again."
+          : "Failed to add job. Please try again."
+      );
     }
   };
 
   const handleCancel = async () => {
-    const hasChanges = editingJob ? 
-      (formData.company !== editingJob.company ||
-       formData.position !== editingJob.position ||
-       formData.status !== editingJob.status ||
-       formData.notes !== (editingJob.notes || "")) :
-      (formData.company.trim() !== "" ||
-       formData.position.trim() !== "" ||
-       formData.status !== "Applied" ||
-       formData.notes.trim() !== "");
+    const hasChanges = editingJob
+      ? formData.company !== editingJob.company ||
+        formData.position !== editingJob.position ||
+        formData.status !== editingJob.status ||
+        formData.notes !== (editingJob.notes || "")
+      : formData.company.trim() !== "" ||
+        formData.position.trim() !== "" ||
+        formData.status !== (user?.role === "USER" ? "Pending" : "Applied") ||
+        formData.notes.trim() !== "";
 
     if (hasChanges) {
       const confirmed = await confirm({
         title: "Discard Changes",
         message: "Are you sure you want to discard your changes?",
-        type: "warning"
+        type: "warning",
       });
 
       if (!confirmed) {
@@ -141,7 +156,7 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
     setFormData({
       company: "",
       position: "",
-      status: "Applied",
+      status: user?.role === "USER" ? "Pending" : "Applied",
       notes: "",
     });
     setEditingJob(null);
@@ -219,18 +234,40 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
             >
               Status
             </label>
-            <select
-              id="status"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            >
-              <option value="Applied">Applied</option>
-              <option value="Interview">Interview</option>
-              <option value="Offer">Offer</option>
-              <option value="Rejected">Rejected</option>
-            </select>
+            {user?.role === "USER" ? (
+              <input
+                type="text"
+                id="status"
+                name="status"
+                value="Pending"
+                disabled
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-500"
+              />
+            ) : user?.role === "ADMIN" ? (
+              <select
+                id="status"
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              >
+                <option value="Approve">Approve</option>
+                <option value="Denied">Denied</option>
+              </select>
+            ) : (
+              <select
+                id="status"
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              >
+                <option value="Applied">Applied</option>
+                <option value="Interview">Interview</option>
+                <option value="Offer">Offer</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            )}
           </div>
 
           {/* Notes Field */}
