@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import Layout from "./layouts/MainLayout";
 import Dashboard from "./pages/Dashboard";
 import AddJob from "./pages/AddJob";
@@ -8,6 +13,7 @@ import { fetchJobs } from "./api/JobAPI";
 import { Toaster } from "react-hot-toast";
 import ConfirmModal from "./components/ConfirmModal";
 import { useConfirm } from "./hooks/useConfirm";
+import Login from "./pages/Login";
 
 function AppContent() {
   const [jobs, setJobs] = useState([]);
@@ -25,7 +31,7 @@ function AppContent() {
 
   // Clear editingJob when navigating away from add-job page
   useEffect(() => {
-    if (location.pathname !== '/add-job') {
+    if (location.pathname !== "/add-job") {
       setEditingJob(null);
     }
   }, [location.pathname]);
@@ -33,6 +39,8 @@ function AppContent() {
   return (
     <>
       <Routes>
+        <Route path="/login" element={<Login />} />
+
         <Route path="/" element={<Layout />}>
           <Route
             index
@@ -60,33 +68,33 @@ function AppContent() {
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
-      
+
       {/* Toast Container */}
       <Toaster
         position="top-right"
         toastOptions={{
           duration: 4000,
           style: {
-            background: '#363636',
-            color: '#fff',
+            background: "#363636",
+            color: "#fff",
           },
           success: {
             duration: 3000,
             iconTheme: {
-              primary: '#4ade80',
-              secondary: '#fff',
+              primary: "#4ade80",
+              secondary: "#fff",
             },
           },
           error: {
             duration: 4000,
             iconTheme: {
-              primary: '#ef4444',
-              secondary: '#fff',
+              primary: "#ef4444",
+              secondary: "#fff",
             },
           },
         }}
       />
-      
+
       {/* Confirm Modal */}
       <ConfirmModal
         isOpen={confirmState.isOpen}
