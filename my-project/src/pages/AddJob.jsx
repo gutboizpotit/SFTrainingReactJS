@@ -7,6 +7,9 @@ import toast from "react-hot-toast";
 const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
   const { user } = useAuth();
   const [formData, setFormData] = useState({
+    name: "",
+    phone_number: "",
+    email: "",
     company: "",
     position: "",
     status: user?.role === "USER" ? "Pending" : "Approved",
@@ -20,6 +23,9 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
   useEffect(() => {
     if (editingJob) {
       setFormData({
+        name: editingJob.name || "",
+        phone_number: editingJob.phone_number || "",
+        email: editingJob.email || "",
         company: editingJob.company,
         position: editingJob.position,
         status: editingJob.status,
@@ -28,6 +34,9 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
       });
     } else {
       setFormData({
+        name: "",
+        phone_number: "",
+        email: "",
         company: "",
         position: "",
         status: user?.role === "USER" ? "Pending" : "Approved",
@@ -56,10 +65,37 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
   const validateForm = () => {
     const newErrors = {};
 
+    // Name validation
+    if (!formData.name?.trim()) {
+      newErrors.name = "Name is required";
+    }
+
+    // Phone validation
+    if (!formData.phone_number?.trim()) {
+      newErrors.phone = "Phone number is required";
+    } else {
+      const phoneRegex = /^0\d{9}$/;
+      if (!phoneRegex.test(formData.phone_number.trim())) {
+        newErrors.phone = "Phone number must be 10 digits starting with 0";
+      }
+    }
+
+    // Email validation
+    if (!formData.email?.trim()) {
+      newErrors.email = "Email is required";
+    } else {
+      const emailRegex = /^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(formData.email.trim())) {
+        newErrors.email = "Email must have at least 3 characters before @ (e.g., abc@gmail.com)";
+      }
+    }
+
+    // Company validation
     if (!formData.company.trim()) {
       newErrors.company = "Company name is required";
     }
 
+    // Position validation
     if (!formData.position.trim()) {
       newErrors.position = "Position is required";
     }
@@ -148,6 +184,9 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
       }
 
       setFormData({
+        name: "",
+        phone_number: "",
+        email: "",
         company: "",
         position: "",
         status: user?.role === "USER" ? "Pending" : "Approved",
@@ -168,11 +207,17 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
 
   const handleCancel = async () => {
     const hasChanges = editingJob
-      ? formData.company !== editingJob.company ||
+      ? formData.name !== (editingJob.name || "") ||
+        formData.phone_number !== (editingJob.phone_number || "") ||
+        formData.email !== (editingJob.email || "") ||
+        formData.company !== editingJob.company ||
         formData.position !== editingJob.position ||
         formData.status !== editingJob.status ||
         formData.notes !== (editingJob.notes || "")
-      : formData.company.trim() !== "" ||
+      : formData.name.trim() !== "" ||
+        formData.phone_number.trim() !== "" ||
+        formData.email.trim() !== "" ||
+        formData.company.trim() !== "" ||
         formData.position.trim() !== "" ||
         formData.status !== (user?.role === "USER" ? "Pending" : "Approved") ||
         formData.notes.trim() !== "";
@@ -190,6 +235,9 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
     }
 
     setFormData({
+      name: "",
+      phone_number: "",
+      email: "",
       company: "",
       position: "",
       status: user?.role === "USER" ? "Pending" : "Approved",
@@ -251,6 +299,72 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
             </div>
           )}
 
+          {/* Name Field */}
+          <div>
+            <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+              Name *
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              disabled={!canEditField("name")}
+              placeholder="e.g. Cao Quang Thuc"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
+                errors.name ? "border-red-500" : "border-gray-300"
+              } ${!canEditField("name") ? "bg-gray-100 text-gray-500" : ""}`}
+            />
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+            )}
+          </div>
+
+          {/* Phone Field */}
+          <div>
+            <label htmlFor="phone_number" className="block text-sm font-semibold text-gray-700 mb-2">
+              Phone *
+            </label>
+            <input
+              type="text"
+              id="phone_number"
+              name="phone_number"
+              value={formData.phone_number}
+              onChange={handleChange}
+              disabled={!canEditField("phone_number")}
+              placeholder="e.g. 0123456789"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
+                errors.phone ? "border-red-500" : "border-gray-300"
+              } ${!canEditField("phone_number") ? "bg-gray-100 text-gray-500" : ""}`}
+            />
+            {errors.phone && (
+              <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+            )}
+          </div>
+
+          {/* Email Field */}
+          <div>
+            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+              Email *
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              disabled={!canEditField("email")}
+              placeholder="e.g. caoquangthuc@gmail.com"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
+                errors.email ? "border-red-500" : "border-gray-300"
+              } ${!canEditField("email") ? "bg-gray-100 text-gray-500" : ""}`}
+            />
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+            )}
+          </div>
+
           {/* Company Field */}
           <div>
             <label
@@ -266,7 +380,7 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
               value={formData.company}
               onChange={handleChange}
               disabled={!canEditField("company")}
-              placeholder="e.g. Google"
+              placeholder="e.g. LG CNS"
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
                 errors.company ? "border-red-500" : "border-gray-300"
               } ${!canEditField("company") ? "bg-gray-100 text-gray-500" : ""}`}
