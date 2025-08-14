@@ -99,13 +99,15 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
     >
       {/* Tab Selection */}
       <div className="mb-6">
-        <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg w-fit">
+        <div className={`flex space-x-1 p-1 rounded-lg w-fit transition-colors duration-300 ${
+          theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+        }`}>
           <button
             onClick={() => setViewMode("my-jobs")}
             className={`px-6 py-2 rounded-md font-medium transition-all duration-200 ${
               viewMode === "my-jobs"
                 ? theme === "dark"
-                  ? "bg-white text-gray-900 shadow-sm"
+                  ? "bg-purple-600 text-white shadow-sm"
                   : "bg-white text-gray-900 shadow-sm"
                 : theme === "dark"
                 ? "text-gray-400 hover:text-gray-200"
@@ -119,7 +121,7 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
             className={`px-6 py-2 rounded-md font-medium transition-all duration-200 ${
               viewMode === "all-jobs"
                 ? theme === "dark"
-                  ? "bg-white text-gray-900 shadow-sm"
+                  ? "bg-purple-600 text-white shadow-sm"
                   : "bg-white text-gray-900 shadow-sm"
                 : theme === "dark"
                 ? "text-gray-400 hover:text-gray-200"
