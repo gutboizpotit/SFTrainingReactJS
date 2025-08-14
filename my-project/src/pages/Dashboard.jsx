@@ -8,6 +8,7 @@ import { useAuth } from "../context/AuthContext";
 const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [viewMode, setViewMode] = useState("my-jobs"); // "my-jobs" or "all-jobs"
   const [theme, setTheme] = useState(
     () => localStorage.getItem("theme") || "light"
   );
@@ -22,7 +23,16 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
   }, []);
 
   const filteredJobs = useMemo(() => {
-    return jobs.filter((job) => {
+    let jobsToFilter = jobs;
+    
+    // Filter by view mode first
+    if (viewMode === "my-jobs") {
+      jobsToFilter = jobs.filter((job) => job.user === user?.username);
+    }
+    // "all-jobs" shows all jobs, so no additional filtering needed
+    
+    // Then apply search and status filters
+    return jobsToFilter.filter((job) => {
       const matchesSearch =
         job.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
         job.company.toLowerCase().includes(searchTerm.toLowerCase());
@@ -31,7 +41,7 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
         job.status.toLowerCase() === statusFilter.toLowerCase();
       return matchesSearch && matchesStatus;
     });
-  }, [jobs, searchTerm, statusFilter]);
+  }, [jobs, searchTerm, statusFilter, viewMode, user?.username]);
 
   // Check permissions for each job
   const canEditJob = (job) => {
@@ -87,13 +97,51 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
           : "bg-white text-gray-900"
       }`}
     >
-      <h1
-        className={`text-2xl md:text-3xl font-bold mb-6 ${
-          theme === "dark" ? "text-gray-100" : "text-gray-900"
-        }`}
-      >
-        My Jobs
-      </h1>
+      {/* Tab Selection */}
+      <div className="mb-6">
+        <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg w-fit">
+          <button
+            onClick={() => setViewMode("my-jobs")}
+            className={`px-6 py-2 rounded-md font-medium transition-all duration-200 ${
+              viewMode === "my-jobs"
+                ? theme === "dark"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "bg-white text-gray-900 shadow-sm"
+                : theme === "dark"
+                ? "text-gray-400 hover:text-gray-200"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            My Jobs
+          </button>
+          <button
+            onClick={() => setViewMode("all-jobs")}
+            className={`px-6 py-2 rounded-md font-medium transition-all duration-200 ${
+              viewMode === "all-jobs"
+                ? theme === "dark"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "bg-white text-gray-900 shadow-sm"
+                : theme === "dark"
+                ? "text-gray-400 hover:text-gray-200"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            All Jobs
+          </button>
+        </div>
+        
+        {/* Current view title */}
+        <h1
+          className={`text-2xl md:text-3xl font-bold mt-4 ${
+            theme === "dark" ? "text-gray-100" : "text-gray-900"
+          }`}
+        >
+          {viewMode === "my-jobs" ? "My Jobs" : "All Jobs"}
+          <span className="text-lg font-normal text-gray-500 ml-2">
+            ({filteredJobs.length})
+          </span>
+        </h1>
+      </div>
 
       {/* Search and Filter */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
@@ -119,7 +167,7 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
         >
           <option value="">All Status</option>
           <option value="Pending">Pending</option>
-          <option value="Accepted">Accepted</option>
+          <option value="Approved">Approved</option>
           <option value="Rejected">Rejected</option>
         </select>
         <button
@@ -148,7 +196,9 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
           >
             {jobs.length === 0
               ? "Start by adding your first job application!"
-              : "Try adjusting your search or filter criteria."}
+              : viewMode === "my-jobs"
+              ? "You haven't created any jobs yet, or try adjusting your search criteria."
+              : "No jobs match your search criteria."}
           </p>
           {jobs.length === 0 && (
             <button
