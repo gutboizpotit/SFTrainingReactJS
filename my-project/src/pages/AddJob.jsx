@@ -12,14 +12,23 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
     email: "",
     company: "",
     position: "",
-    status: user?.role === "USER" ? "Pending" : "Approved",
+    status: user?.role === "USER" ? "Pending" : "Accepted",
     notes: "",
     user: user?.username || "",
   });
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("theme") || "light"
+  );
 
-  // Load editing job data
+  useEffect(() => {
+    const handleStorage = () => {
+      setTheme(localStorage.getItem("theme") || "light");
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
   useEffect(() => {
     if (editingJob) {
       setFormData({
@@ -30,7 +39,7 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
         position: editingJob.position,
         status: editingJob.status,
         notes: editingJob.notes || "",
-        user: editingJob.user, // Always keep the original job owner
+        user: editingJob.user,
       });
     } else {
       setFormData({
@@ -39,12 +48,11 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
         email: "",
         company: "",
         position: "",
-        status: user?.role === "USER" ? "Pending" : "Approved",
+        status: user?.role === "USER" ? "Pending" : "Accepted",
         notes: "",
         user: user?.username || "",
       });
     }
-    // eslint-disable-next-line
   }, [editingJob, user]);
 
   const handleChange = (e) => {
@@ -64,13 +72,9 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
 
   const validateForm = () => {
     const newErrors = {};
-
-    // Name validation
     if (!formData.name?.trim()) {
       newErrors.name = "Name is required";
     }
-
-    // Phone validation
     if (!formData.phone_number?.trim()) {
       newErrors.phone = "Phone number is required";
     } else {
@@ -79,37 +83,30 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
         newErrors.phone = "Phone number must be 10 digits starting with 0";
       }
     }
-
-    // Email validation
     if (!formData.email?.trim()) {
       newErrors.email = "Email is required";
     } else {
       const emailRegex = /^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       if (!emailRegex.test(formData.email.trim())) {
-        newErrors.email = "Email must have at least 3 characters before @ (e.g., abc@gmail.com)";
+        newErrors.email =
+          "Email must have at least 3 characters before @ (e.g., abc@gmail.com)";
       }
     }
-
-    // Company validation
     if (!formData.company.trim()) {
       newErrors.company = "Company name is required";
     }
-
-    // Position validation
     if (!formData.position.trim()) {
       newErrors.position = "Position is required";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Check if user can edit the job
   const canEditJob = () => {
     if (!editingJob) return true; // Can always add new job
-    
+
     if (user?.role === "ADMIN") return true; // Admin can edit any job
-    
+
     // User can only edit if status is Pending
     return editingJob.status === "Pending";
   };
@@ -117,7 +114,7 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
   // Check if fields should be editable
   const canEditField = (fieldName) => {
     if (!editingJob) return true; // Can edit all fields when adding new job
-    
+
     if (user?.role === "ADMIN") {
       // Admin editing user's job can only edit status
       if (editingJob.user !== user?.username) {
@@ -126,7 +123,7 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
       // Admin editing own job can edit all fields
       return true;
     }
-    
+
     // User can edit their own job only if status is Pending
     return editingJob.status === "Pending";
   };
@@ -135,7 +132,9 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
     e.preventDefault();
 
     if (!canEditJob()) {
-      toast.error("You cannot edit this job because it has been approved or rejected.");
+      toast.error(
+        "You cannot edit this job because it has been Accepted or rejected."
+      );
       return;
     }
 
@@ -165,7 +164,7 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
     const jobData = {
       ...formData,
       status,
-      user: editingJob ? editingJob.user : (user?.username || ""),
+      user: editingJob ? editingJob.user : user?.username || "",
       id: editingJob ? editingJob.id : Date.now(),
       applied_date: editingJob
         ? editingJob.applied_date
@@ -189,7 +188,7 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
         email: "",
         company: "",
         position: "",
-        status: user?.role === "USER" ? "Pending" : "Approved",
+        status: user?.role === "USER" ? "Pending" : "Accepted",
         notes: "",
         user: user?.username || "",
       });
@@ -219,7 +218,7 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
         formData.email.trim() !== "" ||
         formData.company.trim() !== "" ||
         formData.position.trim() !== "" ||
-        formData.status !== (user?.role === "USER" ? "Pending" : "Approved") ||
+        formData.status !== (user?.role === "USER" ? "Pending" : "Accepted") ||
         formData.notes.trim() !== "";
 
     if (hasChanges) {
@@ -240,7 +239,7 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
       email: "",
       company: "",
       position: "",
-      status: user?.role === "USER" ? "Pending" : "Approved",
+      status: user?.role === "USER" ? "Pending" : "Accepted",
       notes: "",
       user: user?.username || "",
     });
@@ -249,13 +248,33 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center p-4 bg-white min-h-full">
-      <div className="w-full max-w-lg bg-gray-50 rounded-lg shadow-lg p-6 md:p-8">
+    <div
+      className={`flex-1 flex items-center justify-center p-4 min-h-full transition-colors duration-300 ${
+        theme === "dark"
+          ? "bg-gray-900 text-gray-100"
+          : "bg-white text-gray-900"
+      }`}
+    >
+      <div
+        className={`w-full max-w-lg rounded-lg shadow-lg p-6 md:p-8 transition-colors duration-300 ${
+          theme === "dark"
+            ? "bg-gray-800 border border-gray-700"
+            : "bg-gray-50 border border-gray-200"
+        }`}
+      >
         <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-2">
+          <h1
+            className={`text-2xl md:text-3xl font-bold text-center mb-2 ${
+              theme === "dark" ? "text-gray-100" : "text-gray-900"
+            }`}
+          >
             {editingJob ? "Edit Job" : "Add New Job"}
           </h1>
-          <p className="text-center text-gray-600">
+          <p
+            className={`text-center ${
+              theme === "dark" ? "text-gray-300" : "text-gray-600"
+            }`}
+          >
             {editingJob
               ? "Update your job application details"
               : "Track your job applications"}
@@ -265,16 +284,37 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Warning message for non-editable jobs */}
           {editingJob && !canEditJob() && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div
+              className={`rounded-lg p-4 border transition-colors duration-300 ${
+                theme === "dark"
+                  ? "bg-yellow-900 border-yellow-700"
+                  : "bg-yellow-50 border-yellow-200"
+              }`}
+            >
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  <svg
+                    className={`h-5 w-5 ${
+                      theme === "dark" ? "text-yellow-300" : "text-yellow-400"
+                    }`}
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm text-yellow-800">
-                    This job has been {editingJob.status.toLowerCase()} and cannot be edited. You can only delete it.
+                  <p
+                    className={`text-sm ${
+                      theme === "dark" ? "text-yellow-200" : "text-yellow-800"
+                    }`}
+                  >
+                    This job has been {editingJob.status.toLowerCase()} and
+                    cannot be edited. You can only delete it.
                   </p>
                 </div>
               </div>
@@ -282,26 +322,51 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
           )}
 
           {/* Info message for admin editing user's job */}
-          {editingJob && user?.role === "ADMIN" && editingJob.user !== user?.username && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-blue-800">
-                    You are editing a user's job application. As an admin, you can only modify the status.
-                  </p>
+          {editingJob &&
+            user?.role === "ADMIN" &&
+            editingJob.user !== user?.username && (
+              <div
+                className={`rounded-lg p-4 border transition-colors duration-300 ${
+                  theme === "dark"
+                    ? "bg-blue-900 border-blue-700"
+                    : "bg-blue-50 border-blue-200"
+                }`}
+              >
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg
+                      className={`h-5 w-5 ${
+                        theme === "dark" ? "text-blue-300" : "text-blue-400"
+                      }`}
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p
+                      className={`text-sm ${
+                        theme === "dark" ? "text-blue-200" : "text-blue-800"
+                      }`}
+                    >
+                      You are editing a user's job application. As an admin, you
+                      can only modify the status.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-
+            )}
           {/* Name Field */}
           <div>
-            <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label
+              htmlFor="name"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
               Name *
             </label>
             <input
@@ -323,7 +388,10 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
 
           {/* Phone Field */}
           <div>
-            <label htmlFor="phone_number" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label
+              htmlFor="phone_number"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
               Phone *
             </label>
             <input
@@ -336,7 +404,9 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
               placeholder="e.g. 0123456789"
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
                 errors.phone ? "border-red-500" : "border-gray-300"
-              } ${!canEditField("phone_number") ? "bg-gray-100 text-gray-500" : ""}`}
+              } ${
+                !canEditField("phone_number") ? "bg-gray-100 text-gray-500" : ""
+              }`}
             />
             {errors.phone && (
               <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
@@ -345,7 +415,10 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
 
           {/* Email Field */}
           <div>
-            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label
+              htmlFor="email"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
               Email *
             </label>
             <input
@@ -408,7 +481,9 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
               placeholder="e.g. Frontend Developer"
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
                 errors.position ? "border-red-500" : "border-gray-300"
-              } ${!canEditField("position") ? "bg-gray-100 text-gray-500" : ""}`}
+              } ${
+                !canEditField("position") ? "bg-gray-100 text-gray-500" : ""
+              }`}
             />
             {errors.position && (
               <p className="mt-1 text-sm text-red-600">{errors.position}</p>
@@ -444,7 +519,7 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
                 }`}
               >
                 <option value="Pending">Pending</option>
-                <option value="Approved">Approved</option>
+                <option value="Accepted">Accepted</option>
                 <option value="Rejected">Rejected</option>
               </select>
             )}

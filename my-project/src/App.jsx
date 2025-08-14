@@ -18,6 +18,7 @@ import { useConfirm } from "./hooks/useConfirm";
 import Login from "./pages/Login";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { ThemeProvider } from "./context/ThemeContext";
 
 function AppContent() {
   const [jobs, setJobs] = useState([]);
@@ -32,7 +33,7 @@ function AppContent() {
       setJobs(jobsData);
     };
     if (user) getJobs();
-  }, [user,jobs]);
+  }, [user]);
 
   useEffect(() => {
     if (location.pathname !== "/add-job") {
@@ -119,9 +120,11 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
+      <ThemeProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

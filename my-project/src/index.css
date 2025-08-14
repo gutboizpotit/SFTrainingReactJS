@@ -1,6 +1,6 @@
 @import "tailwindcss";
-
 /* Custom utility classes */
+@custom-variant dark {(&:where(.dark, .dark *))}
 .line-clamp-2 {
   display: -webkit-box;
   line-clamp: 2;

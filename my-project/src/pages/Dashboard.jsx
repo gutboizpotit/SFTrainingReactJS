@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import JobCard from "../components/JobCard";
 import { deleteJob } from "../api/JobAPI";
@@ -8,8 +8,18 @@ import { useAuth } from "../context/AuthContext";
 const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("theme") || "light"
+  );
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  useEffect(() => {
+    const handleStorage = () =>
+      setTheme(localStorage.getItem("theme") || "light");
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
 
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
@@ -70,8 +80,18 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
   };
 
   return (
-    <main className="flex-1 p-4 md:p-8 bg-white min-h-full">
-      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900">
+    <main
+      className={`flex-1 p-4 md:p-8 min-h-full transition-colors duration-300 ${
+        theme === "dark"
+          ? "bg-gray-900 text-gray-100"
+          : "bg-white text-gray-900"
+      }`}
+    >
+      <h1
+        className={`text-2xl md:text-3xl font-bold mb-6 ${
+          theme === "dark" ? "text-gray-100" : "text-gray-900"
+        }`}
+      >
         My Jobs
       </h1>
 
@@ -82,17 +102,25 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
           placeholder="Search jobs..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className={`flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors ${
+            theme === "dark"
+              ? "bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-400"
+              : "bg-white border-gray-300 text-gray-900 placeholder-gray-400"
+          }`}
         />
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="flex-1 md:flex-none md:w-48 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className={`flex-1 md:flex-none md:w-48 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors ${
+            theme === "dark"
+              ? "bg-gray-800 border-gray-700 text-gray-100"
+              : "bg-white border-gray-300 text-gray-900"
+          }`}
         >
           <option value="">All Status</option>
           <option value="Pending">Pending</option>
-          <option value="Approve">Approve</option>
-          <option value="Denied">Denied</option>
+          <option value="Accepted">Accepted</option>
+          <option value="Rejected">Rejected</option>
         </select>
         <button
           onClick={handleAddJob}
@@ -106,10 +134,18 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
       {filteredJobs.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-gray-400 text-6xl mb-4">📝</div>
-          <h3 className="text-xl font-semibold text-gray-600 mb-2">
+          <h3
+            className={`text-xl font-semibold mb-2 ${
+              theme === "dark" ? "text-gray-300" : "text-gray-600"
+            }`}
+          >
             No jobs found
           </h3>
-          <p className="text-gray-500 mb-6">
+          <p
+            className={`mb-6 ${
+              theme === "dark" ? "text-gray-400" : "text-gray-500"
+            }`}
+          >
             {jobs.length === 0
               ? "Start by adding your first job application!"
               : "Try adjusting your search or filter criteria."}
@@ -133,6 +169,7 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
               onDelete={handleDelete}
               canEdit={canEditJob(job)}
               canDelete={canDeleteJob(job)}
+              theme={theme}
             />
           ))}
         </div>
