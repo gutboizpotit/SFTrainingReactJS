@@ -365,7 +365,9 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
           <div>
             <label
               htmlFor="name"
-              className="block text-sm font-semibold text-gray-700 mb-2"
+              className={`block text-sm font-semibold mb-2 ${
+                theme === "dark" ? "text-gray-200" : "text-gray-700"
+              }`}
             >
               Name *
             </label>
@@ -379,7 +381,13 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
               placeholder="e.g. Cao Quang Thuc"
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
                 errors.name ? "border-red-500" : "border-gray-300"
-              } ${!canEditField("name") ? "bg-gray-100 text-gray-500" : ""}`}
+              } ${
+                !canEditField("name")
+                  ? "bg-gray-100 text-gray-500"
+                  : theme === "dark"
+                  ? "bg-gray-700 text-gray-100"
+                  : "bg-white text-gray-900"
+              }`}
             />
             {errors.name && (
               <p className="mt-1 text-sm text-red-600">{errors.name}</p>
@@ -390,7 +398,9 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
           <div>
             <label
               htmlFor="phone_number"
-              className="block text-sm font-semibold text-gray-700 mb-2"
+              className={`block text-sm font-semibold mb-2 ${
+                theme === "dark" ? "text-gray-200" : "text-gray-700"
+              }`}
             >
               Phone *
             </label>
@@ -405,7 +415,11 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
                 errors.phone ? "border-red-500" : "border-gray-300"
               } ${
-                !canEditField("phone_number") ? "bg-gray-100 text-gray-500" : ""
+                !canEditField("phone_number")
+                  ? "bg-gray-100 text-gray-500"
+                  : theme === "dark"
+                  ? "bg-gray-700 text-gray-100"
+                  : "bg-white text-gray-900"
               }`}
             />
             {errors.phone && (
@@ -417,7 +431,9 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-semibold text-gray-700 mb-2"
+              className={`block text-sm font-semibold mb-2 ${
+                theme === "dark" ? "text-gray-200" : "text-gray-700"
+              }`}
             >
               Email *
             </label>
@@ -431,18 +447,25 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
               placeholder="e.g. caoquangthuc@gmail.com"
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
                 errors.email ? "border-red-500" : "border-gray-300"
-              } ${!canEditField("email") ? "bg-gray-100 text-gray-500" : ""}`}
+              } ${
+                !canEditField("email")
+                  ? "bg-gray-100 text-gray-500"
+                  : theme === "dark"
+                  ? "bg-gray-700 text-gray-100"
+                  : "bg-white text-gray-900"
+              }`}
             />
             {errors.email && (
               <p className="mt-1 text-sm text-red-600">{errors.email}</p>
             )}
           </div>
-
           {/* Company Field */}
           <div>
             <label
               htmlFor="company"
-              className="block text-sm font-semibold text-gray-700 mb-2"
+              className={`block text-sm font-semibold mb-2 ${
+                theme === "dark" ? "text-gray-200" : "text-gray-700"
+              }`}
             >
               Company *
             </label>
@@ -456,7 +479,13 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
               placeholder="e.g. LG CNS"
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
                 errors.company ? "border-red-500" : "border-gray-300"
-              } ${!canEditField("company") ? "bg-gray-100 text-gray-500" : ""}`}
+              } ${
+                !canEditField("company")
+                  ? "bg-gray-100 text-gray-500"
+                  : theme === "dark"
+                  ? "bg-gray-700 text-gray-100"
+                  : "bg-white text-gray-900"
+              }`}
             />
             {errors.company && (
               <p className="mt-1 text-sm text-red-600">{errors.company}</p>
@@ -467,7 +496,9 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
           <div>
             <label
               htmlFor="position"
-              className="block text-sm font-semibold text-gray-700 mb-2"
+              className={`block text-sm font-semibold mb-2 ${
+                theme === "dark" ? "text-gray-200" : "text-gray-700"
+              }`}
             >
               Position *
             </label>
@@ -482,7 +513,11 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
                 errors.position ? "border-red-500" : "border-gray-300"
               } ${
-                !canEditField("position") ? "bg-gray-100 text-gray-500" : ""
+                !canEditField("position")
+                  ? "bg-gray-100 text-gray-500"
+                  : theme === "dark"
+                  ? "bg-gray-700 text-gray-100"
+                  : "bg-white text-gray-900"
               }`}
             />
             {errors.position && (
@@ -494,7 +529,9 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
           <div>
             <label
               htmlFor="status"
-              className="block text-sm font-semibold text-gray-700 mb-2"
+              className={`block text-sm font-semibold mb-2 ${
+                theme === "dark" ? "text-gray-200" : "text-gray-700"
+              }`}
             >
               Status
             </label>
@@ -505,7 +542,11 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
                 name="status"
                 value={formData.status}
                 disabled
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-500"
+                className={`w-full px-4 py-3 border rounded-lg ${
+                  theme === "dark"
+                    ? "bg-gray-700 border-gray-600 text-gray-400"
+                    : "bg-gray-100 border-gray-300 text-gray-500"
+                }`}
               />
             ) : (
               <select
@@ -514,8 +555,14 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
                 value={formData.status}
                 onChange={handleChange}
                 disabled={!canEditField("status")}
-                className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                  !canEditField("status") ? "bg-gray-100 text-gray-500" : ""
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors ${
+                  theme === "dark"
+                    ? !canEditField("status")
+                      ? "bg-gray-700 border-gray-600 text-gray-400"
+                      : "bg-gray-800 border-gray-600 text-gray-100"
+                    : !canEditField("status")
+                    ? "bg-gray-100 border-gray-300 text-gray-500"
+                    : "bg-white border-gray-300 text-gray-900"
                 }`}
               >
                 <option value="Pending">Pending</option>
@@ -529,7 +576,9 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
           <div>
             <label
               htmlFor="notes"
-              className="block text-sm font-semibold text-gray-700 mb-2"
+              className={`block text-sm font-semibold mb-2 ${
+                theme === "dark" ? "text-gray-200" : "text-gray-700"
+              }`}
             >
               Notes
             </label>
@@ -541,12 +590,17 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
               disabled={!canEditField("notes")}
               rows="4"
               placeholder="e.g. Interview scheduled next Monday..."
-              className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-vertical ${
-                !canEditField("notes") ? "bg-gray-100 text-gray-500" : ""
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-vertical transition-colors ${
+                !canEditField("notes")
+                  ? theme === "dark"
+                    ? "bg-gray-700 text-gray-400 border-gray-600"
+                    : "bg-gray-100 text-gray-500 border-gray-300"
+                  : theme === "dark"
+                  ? "bg-gray-800 text-gray-100 border-gray-600"
+                  : "bg-white text-gray-900 border-gray-300"
               }`}
             />
           </div>
-
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
             <button
@@ -554,7 +608,11 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
               disabled={editingJob && !canEditJob()}
               className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-offset-2 ${
                 editingJob && !canEditJob()
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  ? theme === "dark"
+                    ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : theme === "dark"
+                  ? "bg-indigo-700 text-white hover:bg-indigo-800 focus:ring-indigo-500"
                   : "bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500"
               }`}
             >
@@ -563,7 +621,11 @@ const AddJob = ({ jobs, setJobs, editingJob, setEditingJob, confirm }) => {
             <button
               type="button"
               onClick={handleCancel}
-              className="flex-1 bg-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-400 transition-colors focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-colors focus:ring-2 focus:ring-offset-2 ${
+                theme === "dark"
+                  ? "bg-gray-700 text-gray-200 hover:bg-gray-600 focus:ring-gray-600"
+                  : "bg-gray-300 text-gray-700 hover:bg-gray-400 focus:ring-gray-500"
+              }`}
             >
               Cancel
             </button>
