@@ -71,7 +71,7 @@ const Header = ({ onMobileMenuToggle }) => {
             About
           </Link>
           <Link
-            to="#"
+            to="/"
             className={`font-medium px-3 py-2 rounded-lg ${hoverBg}`}
           >
             Profile
@@ -132,7 +132,7 @@ const Header = ({ onMobileMenuToggle }) => {
                 <span>Home</span>
               </Link>
               <Link
-                to="/about"
+                to="/"
                 className={`px-6 py-4 font-medium border-b ${borderColor} ${hoverBg} flex items-center space-x-3`}
                 onClick={toggleMobileMenu}
               >
@@ -140,7 +140,7 @@ const Header = ({ onMobileMenuToggle }) => {
                 <span>About</span>
               </Link>
               <Link
-                to="/profile"
+                to="/"
                 className={`px-6 py-4 font-medium border-b ${borderColor} ${hoverBg} flex items-center space-x-3`}
                 onClick={toggleMobileMenu}
               >

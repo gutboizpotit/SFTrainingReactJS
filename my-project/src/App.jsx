@@ -10,6 +10,7 @@ import Layout from "./layouts/MainLayout";
 import Dashboard from "./pages/Dashboard";
 import AddJob from "./pages/AddJob";
 import Settings from "./pages/Settings";
+import NotFound from "./pages/NotFound";
 import { useEffect, useState } from "react";
 import { fetchJobs } from "./api/JobAPI";
 import { Toaster } from "react-hot-toast";
@@ -78,6 +79,9 @@ function AppContent() {
             <Route path="settings" element={<Settings />} />
           </Route>
         </Route>
+        
+        {/* Catch-all route for 404 Not Found */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
 
       <Toaster
