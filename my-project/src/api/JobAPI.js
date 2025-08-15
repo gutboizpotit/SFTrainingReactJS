@@ -40,6 +40,14 @@ export const login = async (credentials) => {
         success: true,
         role: user.role == "ADMIN" ? "ADMIN" : "USER",
         token: "fake-jwt-token",
+        user_id: user.id,
+        name: user.name,
+        email: user.email,
+        phone_number: user.phone_number,
+        bio: user.bio,
+        location: user.location,
+        cover_image: user.cover_image,
+        profile_image: user.profile_image
       };
     } else {
       return {

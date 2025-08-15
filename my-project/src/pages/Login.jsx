@@ -59,10 +59,19 @@ const Login = () => {
     try {
       const result = await loginApi(formData);
       if (result.success) {
+        console.log("Login successful:", result);
         login({
           username: formData.username,
           role: result.role,
           token: result.token,
+          id: result.user_id,
+          name: result.name,
+          email: result.email,
+          phone_number: result.phone_number,
+          bio: result.bio,
+          location: result.location,
+          cover_image: result.cover_image,
+          profile_image: result.profile_image,
         });
         toast.success("Login successful!");
         navigate("/");

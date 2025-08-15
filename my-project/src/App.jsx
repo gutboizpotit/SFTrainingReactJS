@@ -20,6 +20,7 @@ import Login from "./pages/Login";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ThemeProvider } from "./context/ThemeContext";
+import Profile from "./pages/Profile";
 
 function AppContent() {
   const [jobs, setJobs] = useState([]);
@@ -77,6 +78,7 @@ function AppContent() {
               }
             />
             <Route path="settings" element={<Settings />} />
+            <Route path="profile" element={<Profile />} />
           </Route>
         </Route>
         
