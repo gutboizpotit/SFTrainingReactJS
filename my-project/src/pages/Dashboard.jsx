@@ -4,6 +4,7 @@ import JobCard from "../components/JobCard";
 import { deleteJob } from "../api/JobAPI";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
+import ExportJobsButton from "../components/ExportJobsButton";
 
 const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,13 +25,13 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
 
   const filteredJobs = useMemo(() => {
     let jobsToFilter = jobs;
-    
+
     // Filter by view mode first
     if (viewMode === "my-jobs") {
       jobsToFilter = jobs.filter((job) => job.user === user?.username);
     }
     // "all-jobs" shows all jobs, so no additional filtering needed
-    
+
     // Then apply search and status filters
     return jobsToFilter.filter((job) => {
       const matchesSearch =
@@ -99,9 +100,11 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
     >
       {/* Tab Selection */}
       <div className="mb-6">
-        <div className={`flex space-x-1 p-1 rounded-lg w-fit transition-colors duration-300 ${
-          theme === "dark" ? "bg-gray-800" : "bg-gray-100"
-        }`}>
+        <div
+          className={`flex space-x-1 p-1 rounded-lg w-fit transition-colors duration-300 ${
+            theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+          }`}
+        >
           <button
             onClick={() => setViewMode("my-jobs")}
             className={`px-6 py-2 rounded-md font-medium transition-all duration-200 ${
@@ -131,7 +134,7 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
             All Jobs
           </button>
         </div>
-        
+
         {/* Current view title */}
         <h1
           className={`text-2xl md:text-3xl font-bold mt-4 ${
@@ -172,6 +175,9 @@ const Dashboard = ({ jobs, setJobs, setEditingJob, confirm }) => {
           <option value="Approved">Approved</option>
           <option value="Rejected">Rejected</option>
         </select>
+
+        <ExportJobsButton jobs={filteredJobs} />
+
         <button
           onClick={handleAddJob}
           className="px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors"

@@ -65,10 +65,10 @@ const Header = ({ onMobileMenuToggle }) => {
             Home
           </Link>
           <Link
-            to="/#"
+            to="/about-us"
             className={`font-medium px-3 py-2 rounded-lg ${hoverBg}`}
           >
-            About
+            About Us
           </Link>
           <Link
             to="/profile"
@@ -132,12 +132,12 @@ const Header = ({ onMobileMenuToggle }) => {
                 <span>Home</span>
               </Link>
               <Link
-                to="/"
+                to="/about-us"
                 className={`px-6 py-4 font-medium border-b ${borderColor} ${hoverBg} flex items-center space-x-3`}
                 onClick={toggleMobileMenu}
               >
                 <span>ℹ️</span>
-                <span>About</span>
+                <span>AboutUs</span>
               </Link>
               <Link
                 to="/profile"

@@ -21,6 +21,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ThemeProvider } from "./context/ThemeContext";
 import Profile from "./pages/Profile";
+import AboutUs from "./pages/AboutUs";
 
 function AppContent() {
   const [jobs, setJobs] = useState([]);
@@ -78,10 +79,11 @@ function AppContent() {
               }
             />
             <Route path="settings" element={<Settings />} />
+            <Route path="about-us" element={<AboutUs />} />
             <Route path="profile" element={<Profile />} />
           </Route>
         </Route>
-        
+
         {/* Catch-all route for 404 Not Found */}
         <Route path="*" element={<NotFound />} />
       </Routes>
