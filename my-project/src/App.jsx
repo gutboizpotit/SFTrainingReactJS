@@ -1,35 +1,140 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+  Outlet,
+} from "react-router-dom";
+import Layout from "./layouts/MainLayout";
+import Dashboard from "./pages/Dashboard";
+import AddJob from "./pages/AddJob";
+import Settings from "./pages/Settings";
+import NotFound from "./pages/NotFound";
+import { useEffect, useState } from "react";
+import { fetchJobs } from "./api/JobAPI";
+import { Toaster } from "react-hot-toast";
+import ConfirmModal from "./components/ConfirmModal";
+import { useConfirm } from "./hooks/useConfirm";
+import Login from "./pages/Login";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { ThemeProvider } from "./context/ThemeContext";
+import Profile from "./pages/Profile";
+import AboutUs from "./pages/AboutUs";
 
-function App() {
-  const [count, setCount] = useState(0)
+function AppContent() {
+  const [jobs, setJobs] = useState([]);
+  const [editingJob, setEditingJob] = useState(null);
+  const { confirmState, confirm } = useConfirm();
+  const location = useLocation();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const getJobs = async () => {
+      const jobsData = await fetchJobs();
+      setJobs(jobsData);
+    };
+    if (user) getJobs();
+  }, [user]);
+
+  useEffect(() => {
+    if (location.pathname !== "/add-job") {
+      setEditingJob(null);
+    }
+  }, [location.pathname]);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Routes>
+        <Route
+          path="/login"
+          element={user ? <Navigate to="/" replace /> : <Login />}
+        />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Layout />}>
+            <Route
+              index
+              path="/"
+              element={
+                <Dashboard
+                  jobs={jobs}
+                  setJobs={setJobs}
+                  setEditingJob={setEditingJob}
+                  confirm={confirm}
+                />
+              }
+            />
+            <Route
+              path="add-job"
+              element={
+                <AddJob
+                  jobs={jobs}
+                  setJobs={setJobs}
+                  editingJob={editingJob}
+                  setEditingJob={setEditingJob}
+                  confirm={confirm}
+                />
+              }
+            />
+            <Route path="settings" element={<Settings />} />
+            <Route path="about-us" element={<AboutUs />} />
+            <Route path="profile" element={<Profile />} />
+          </Route>
+        </Route>
+
+        {/* Catch-all route for 404 Not Found */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: "#363636",
+            color: "#fff",
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: "#4ade80",
+              secondary: "#fff",
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: "#ef4444",
+              secondary: "#fff",
+            },
+          },
+        }}
+      />
+
+      <ConfirmModal
+        isOpen={confirmState.isOpen}
+        title={confirmState.title}
+        message={confirmState.message}
+        type={confirmState.type}
+        onConfirm={confirmState.onConfirm}
+        onCancel={confirmState.onCancel}
+      />
     </>
-  )
+  );
 }
 
-export default App
+function App() {
+  return (
+    <AuthProvider>
+      <ThemeProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </ThemeProvider>
+    </AuthProvider>
+  );
+}
+
+export default App;
